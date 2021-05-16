@@ -9,6 +9,23 @@ LeetCode刷题框架 :
 import sys
 
 
+class Node:
+    """链表结点的数据结构定义"""
+
+    def __init__(self, value=None):
+        self.value = value
+        self.next = None
+
+
+class TreeNode:
+    """二叉树结点的数据结构定义"""
+
+    def __init__(self, value=None):
+        self.value = value
+        self.left = None
+        self.right = None
+
+
 # 这里写解决问题的代码，和LeetCode就完全一样了
 def solve(arr):
     pass
