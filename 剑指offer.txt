@@ -1,0 +1,315 @@
+索引：
+1.数组中重复的数字
+2.二维数组中的查找
+3.替换空格
+4.从尾到头打印链表
+5.重建二叉树
+
+剑指 Offer 03. 数组中重复的数字
+找出数组中重复的数字。
+在一个长度为 n 的数组 nums 里的所有数字都在 0～n-1 的范围内。数组中某些数字是重复的，但不知道有几个数字重复了，
+也不知道每个数字重复了几次。请找出数组中任意一个重复的数字。
+
+输入：
+[2, 3, 1, 0, 2, 5, 3]
+输出：2 或 3 
+
+ans：
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <ctime>
+using namespace std;
+
+int findRepeatNumber(vector<int>& nums) {
+    sort(nums.begin(),nums.end());
+    for(int i = 0 ;i < nums.size()-1 ;i++)
+    {
+        if(nums[i] == nums[i+1])
+            return nums[i];
+    }
+    return nums.size();
+}
+//对于数组中每个元素，我们将它插入到哈希表中。如果插入一个元素时发现该元素已经存在于哈希表中，则说明存在重复的元素。
+//     bool containsDuplicate(vector<int>& nums) {
+//        unordered_set<int> s;
+//        for (int x: nums) {
+//            if (s.find(x) != s.end()) {
+//               return true;
+//            }
+//           s.insert(x);
+//        }
+//       return false;
+//    }
+
+
+int main() {
+    ios::sync_with_stdio(false);
+    clock_t begin,end;
+    begin = clock();
+    vector<int> nums = {2,3,1,0,5};
+    int ans;
+    ans = findRepeatNumber(nums);
+    cout<<ans<<endl;
+    end = clock();
+    cout<<"Execute time:"<<(double)(end-begin)/CLOCKS_PER_SEC<<endl;
+}
+
+剑指 Offer 04. 二维数组中的查找
+在一个 n * m 的二维数组中，每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个高效的函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+
+示例:
+现有矩阵 matrix 如下：
+[
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
+给定 target = 5，返回 true。
+给定 target = 20，返回 false。
+
+：
+我们将矩阵逆时针旋转 45° ，并将其转化为图形式，发现其类似于 二叉搜索树 ，即对于每个元素，其左分支元素更小、右分支元素更大。因此，通过从 “根节点” 开始搜索，遇到比 target 大的元素就向左，反之向右，即可找到目标值 target 。
+“根节点” 对应的是矩阵的 “左下角” 和 “右上角” 元素，本文称之为 标志数 ，以 matrix 中的 左下角元素 为标志数 flag ，则有:
+
+若 flag > target ，则 target 一定在 flag 所在 行的上方 ，即 flag 所在行可被消去。
+若 flag < target ，则 target 一定在 flag 所在 列的右方 ，即 flag 所在列可被消去。
+算法流程：
+从矩阵 matrix 左下角元素（索引设为 (i, j) ）开始遍历，并与目标值对比：
+当 matrix[i][j] > target 时，执行 i-- ，即消去第 i 行元素；
+当 matrix[i][j] < target 时，执行 j++ ，即消去第 j 列元素；
+当 matrix[i][j] = target 时，返回 truetrue ，代表找到目标值。
+若行索引或列索引越界，则代表矩阵中无目标值，返回 falsefalse 。
+每轮 i 或 j 移动后，相当于生成了“消去一行（列）的新矩阵”， 索引(i,j) 指向新矩阵的左下角元素（标志数），因此可重复使用以上性质消去行（列）。
+
+复杂度分析：
+时间复杂度 O(M+N)O(M+N) ：其中，NN 和 MM 分别为矩阵行数和列数，此算法最多循环 M+NM+N 次。
+空间复杂度 O(1)O(1) : i, j 指针使用常数大小额外空间。
+
+class Solution {
+public:
+    bool findNumberIn2DArray(vector<vector<int>>& matrix, int target) {
+        int i = matrix.size() - 1, j = 0;
+        while(i >= 0 && j < matrix[0].size())
+        {
+            if(matrix[i][j] > target) i--;
+            else if(matrix[i][j] < target) j++;
+            else return true;
+        }
+        return false;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    clock_t begin,end;
+    begin = clock();
+    vector<vector<int>> matrix = {{1,   4,  7, 11, 15},
+                                  {2,   5,  8, 12, 19},
+                                  {3,   6,  9, 16, 22},
+                                  {10, 13, 14, 17, 24},
+                                  {18, 21, 23, 26, 30}};
+    int target = 30;
+    Solution A;
+    bool ans;
+    ans = A.findNumberIn2DArray(matrix,target);
+    if(ans) cout<<"true"<<endl;
+    else cout<<"false"<<endl;
+    end = clock();
+    cout<<"Execute time:"<<(double)(end-begin)/CLOCKS_PER_SEC<<endl;
+}
+
+剑指 Offer 05. 替换空格
+请实现一个函数，把字符串 s 中的每个空格替换成"%20"。
+
+示例 1：
+输入：s = "We are happy."
+输出："We%20are%20happy."
+
+算法流程：
+初始化：空格数量 count ，字符串 s 的长度 len ；
+统计空格数量：遍历 s ，遇空格则 count++ ；
+修改 s 长度：添加完 "%20" 后的字符串长度应为 len + 2 * count ；
+倒序遍历修改：i 指向原字符串尾部元素， j 指向新字符串尾部元素；当 i = j 时跳出（代表左方已没有空格，无需继续遍历）；
+当 s[i] 不为空格时：执行 s[j] = s[i] ；
+当 s[i] 为空格时：将字符串闭区间 [j-2, j] 的元素修改为 "%20" ；由于修改了 3 个元素，因此需要 j -= 2 ；
+返回值：已修改的字符串 s ；
+
+class Solution {
+public:
+    string replaceSpace(string s) {
+        int count = 0,len = s.size();
+        //统计空格数量
+        for(char c:s){
+            if(c == ' ') count++;
+        }
+        //修改s长度
+        s.resize(len+2*count);
+        for(int i = len-1,j = s.size()-1; i<j ; i--,j--){
+            if(s[i]!=' ')
+                s[j] = s[i];
+            else {
+                s[j-2] = '%';
+                s[j-1] = '2';
+                s[j] = '0';
+                j-=2;
+            }
+        }
+        return s;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    clock_t begin,end;
+    begin = clock();
+    Solution A;
+    cout<<endl;
+    //从此处开始
+    string s = "We are happy mother fucker bitch";
+    string ans;
+    ans = A.replaceSpace(s);
+    //此处结束
+    cout<<ans<<endl;
+    end = clock();
+    cout<<endl<<"Execute time:"<<(double)(end-begin)/CLOCKS_PER_SEC<<endl;
+}
+剑指 Offer 06. 从尾到头打印链表
+输入一个链表的头节点，从尾到头反过来返回每个节点的值（用数组返回）。
+
+示例 1：
+输入：head = [1,3,2]
+输出：[2,3,1]
+
+struct ListNode {
+     int val;
+     ListNode *next;
+     ListNode(int x) : val(x), next(NULL) {}
+};
+//先遍历打印在数组中然后反转数组，或者用一个栈
+class Solution {
+public:
+    vector<int> reversePrint(ListNode* head) {
+        vector<int> v;
+        ListNode* cur = head;
+        while (cur) {
+            v.push_back(cur->val);
+            cur = cur->next;
+        }
+        reverse(v.begin(), v.end());
+        /*反转过程手写：
+        int i = 0,j = ans.size()-1;
+        while(i < j){
+            int temp = ans[i];
+            ans[i++] = ans[j];
+            ans[j--] = temp;
+        }
+        */
+        return v;
+    }
+   vector<int> reversePrint(ListNode* head) {
+        stack<int>s;
+        vector<int>ans;
+        while(head)
+        {
+            s.push(head->val);
+            head = head->next;
+        }
+        while(!s.empty())
+        {
+            ans.push_back(s.top());
+            s.pop();
+        }
+        return ans;
+
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    clock_t begin,end;
+    begin = clock();
+    Solution A;
+    cout<<endl;
+    //从此处开始
+    int length = 3;//length-1
+    int x1,xi;
+    cin>>x1;
+    ListNode* head = NULL;
+    head = new ListNode(x1);
+    ListNode* p = head;
+    while(--length){
+        cin>>xi;
+        p->next = new ListNode(xi);
+        p = p->next;
+    }
+    p = head;
+    while(p){
+        cout<<p->val<<endl;
+        p = p->next;
+    }
+    vector<int> ans;
+    ans = A.reversePrint(head);
+    for (auto iter = ans.begin(); iter != ans.end(); iter++) {
+        cout << (*iter) << endl;
+    }
+    //此处结束
+    end = clock();
+    cout<<endl<<"Execute time:"<<(double)(end-begin)/CLOCKS_PER_SEC<<endl;
+}
+
+剑指 Offer 07. 重建二叉树
+输入某二叉树的前序遍历和中序遍历的结果，请重建该二叉树。假设输入的前序遍历和中序遍历的结果中都不含重复的数字。
+
+例如，给出
+前序遍历 preorder = [3,9,20,15,7]
+中序遍历 inorder = [9,3,15,20,7]
+返回如下的二叉树：
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder)
+    {
+        return recursionBuild(preorder.begin(),preorder.end(),inorder.begin(),inorder.end());
+    }
+    TreeNode* recursionBuild(vector<int>::iterator preBegin, vector<int>::iterator preEnd,vector<int>::iterator inBegin, vector<int>::iterator inEnd)
+    {
+        if(inEnd==inBegin) return NULL;
+        TreeNode* cur = new TreeNode(*preBegin);
+        auto root = find(inBegin,inEnd,*preBegin);
+        cur->left = recursionBuild(preBegin+1,preBegin+1+(root-inBegin),inBegin,root);
+        cur->right = recursionBuild(preBegin+1+(root-inBegin),preEnd,root+1,inEnd);
+        return cur;
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    clock_t begin,end;
+    begin = clock();
+    Solution A;
+    cout<<endl;
+    //从此处开始
+    vector<int> preorder = {3,9,20,15,7};
+    vector<int> inorder = {9,3,15,20,7};
+    TreeNode* ans;
+    ans = A.buildTree(preorder,inorder);
+    //此处结束
+    end = clock();
+    cout<<endl<<"Execute time:"<<(double)(end-begin)/CLOCKS_PER_SEC<<endl;
+}
